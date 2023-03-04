@@ -1,0 +1,109 @@
+/************liste.h*************/
+#include <stdio.h>
+
+struct noeud {
+	int i;
+	struct noeud * suivant;
+	struct noeud * precedent;
+};
+
+struct noeud * creer_lc_uni();
+unsigned lc_uni_vide(struct noeud *);
+
+void insererAvantPtAcc(struct noeud **, int);
+void supprimerApres(struct noeud *, struct noeud **);
+/**********fin liste.h***********/
+
+/************liste.c*************/
+#include <stdio.h>
+#include <stdlib.h>
+#include "liste.h"
+
+struct noeud * creer_lc_uni()
+{ return NULL; }
+
+unsigned lc_uni_vide(struct noeud * lc)
+{ return (lc == NULL); }
+
+void insererAvantPtAcc(struct noeud ** plc, int i)
+{
+	struct noeud * p;
+	p = (struct noeud *)malloc(sizeof(struct noeud));
+	p->i = i;
+	if(lc_uni_vide(*plc))
+	{
+		p->suivant = p;
+		p->precedent = p;
+	}
+	else
+	{
+		p->suivant = *plc;
+		p->precedent = (*plc)->precedent;
+		p->precedent->suivant = p;
+		(*plc)->precedent = p;
+	}
+	*plc=p;
+}
+
+void supprimerApres(struct noeud * elem, struct noeud **plc)
+{
+	struct noeud * p = elem->suivant;
+	if(p==elem)
+	{
+		printf("Cette fonction efface ssi el existe plus qu'un seul element!");
+		return;
+	}
+	
+	elem->suivant = p->suivant;
+	p->suivant->precedent = elem;
+	
+	if(*plc==p)
+		*plc = p->suivant;
+		
+	free(p);
+}
+/**********fin liste.c***********/
+
+/*************main.c*************/
+#include <stdio.h>
+#include <stdlib.h>
+#include "liste.h"
+
+void afficher_lc(struct noeud * lc)
+{
+	struct noeud * p;
+	p=lc;
+	do
+	{
+		printf("%d\t", p->i);
+		p = p->suivant;
+	} while(p!=lc);
+	printf("\n");
+}
+
+void remplir(struct noeud **plc, int n)
+{
+	int i;
+	for(i=0;i<n;i++)
+		insererAvantPtAcc(plc, n-i);
+}
+
+void main()
+{
+	struct noeud * lc = creer_lc_uni(), *p;
+	
+	remplir(&lc, 7);
+	afficher_lc(lc);
+	
+	p=lc;
+	while(p!=p->suivant)
+	{
+		supprimerApres(p, &lc);
+		afficher_lc(lc);
+		p=p->suivant;
+	}
+	
+	printf("\nRes : ");
+	afficher_lc(lc);
+}
+/***********fin main.c************/
